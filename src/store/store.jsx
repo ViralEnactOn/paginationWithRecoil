@@ -21,19 +21,26 @@ export const industriesDataState = atom({
 
 export const fetchIndustriesData = selector({
   key: "fetchIndustriesData",
-  get: async ({ get }) => {
+  get: ({ get }) => {
     const limit = get(limitState);
     const skip = get(skipState);
-
-    try {
-      const response = await fetch(
-        `${baseURL}/todos?limit=${limit}&skip=${skip}`
-      );
-      const data = await response.json();
-      return data.todos;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
+    return API_CALL({ limit, skip });
+  },
+  set: (limit, skip) => {
+    console.log("called", limit, skip);
+    // return API_CALL({ limit, skip });
   },
 });
+
+async function API_CALL({ limit, skip }) {
+  try {
+    const response = await fetch(
+      `${baseURL}/todos?limit=${limit}&skip=${skip}`
+    );
+    const data = await response.json();
+    return data.todos;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return null;
+  }
+}

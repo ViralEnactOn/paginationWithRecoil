@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/jsx-no-target-blank */
-import { useEffect } from "react";
+import { Suspense, startTransition, useEffect } from "react";
 import "./App.css";
 import {
   fetchIndustriesData,
@@ -19,13 +20,10 @@ import axios from "axios";
 
 function App() {
   const navigate = useNavigate();
-  // const firstData = useRecoilValue(fetchIndustriesData);
-  // const [firstData, setFirstData] = useRecoilState(fetchIndustriesData);
+  const [firstData, setFirstData] = useRecoilState(fetchIndustriesData);
   const [updateData, setUpdateData] = useRecoilState(industriesDataState);
-  const skip = useRecoilValue(skipState);
+  const [skip, setSkip] = useRecoilState(skipState);
   const [limit, setLimit] = useRecoilState(limitState);
-  const setSkip = useSetRecoilState(skipState);
-
   // Fetch Data
   const fetchMoreData = async (skipRecord) => {
     try {
@@ -45,17 +43,41 @@ function App() {
     }
   };
 
+  const fetchData = () => {
+    // setUpdateData((prevIndustriesData) => {
+    //   if (prevIndustriesData === null || prevIndustriesData === undefined) {
+    //     return firstData;
+    //   } else {
+    //     return [...prevIndustriesData, ...firstData];
+    //   }
+    // });
+    // setLoading(false);
+  };
+
   useEffect(() => {
-    if (updateData === null) {
-      fetchMoreData(skip);
-    }
+    // (async () => {
+    //   const firstData = await useRecoilValue(fetchIndustriesData);
+    // })();
+    // if (updateData === null) {
+    //   // fetchMoreData(skip);
+    //   // fetchData();
+    // }
   }, []);
 
   // Pagination logic
   const handlePageClick = () => {
-    setSkip((prevSkip) => prevSkip + 10);
-    fetchMoreData(skip + 10);
+    console.log("next call");
+    let newSkip = skip + 10;
+    setFirstData(limit, newSkip);
+    // startTransition(() => {
+    //   setSkip((prevSkip) => prevSkip + 10);
+    // });
   };
+
+  useEffect(() => {
+    // setFirstData(limit, skip);
+    return () => {};
+  }, [skip]);
 
   // Handle change page
   const handleNavigate = () => {
@@ -75,10 +97,10 @@ function App() {
             </button>
           </div>
           <InfiniteScroll
-            dataLength={updateData ? updateData.length : 10}
+            dataLength={firstData ? firstData.length : 10}
             next={handlePageClick}
             hasMore={
-              updateData ? (updateData.length === 150 ? false : true) : true
+              firstData ? (firstData.length === 150 ? false : true) : true
             }
             loader={
               <div className="flex justify-center mt-10 mb-10">
@@ -98,9 +120,9 @@ function App() {
             }
           >
             <div className="flex flex-col justify-evenly mt-12">
-              {updateData !== null &&
-                updateData !== undefined &&
-                updateData.map((data, index) => {
+              {firstData !== null &&
+                firstData !== undefined &&
+                firstData.map((data, index) => {
                   return (
                     <div key={index} className="bg-white rounded-lg p-5 mt-10">
                       <div className="flex justify-center">{data.todo}</div>

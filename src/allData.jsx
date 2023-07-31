@@ -6,7 +6,6 @@ import { industriesDataState } from "./store/store";
 
 function allData() {
   const data = useRecoilValue(industriesDataState);
-  console.log("data", data);
   return (
     <main className="flex justify-center min-w-max bg-gray-100 ">
       <div className="container">
